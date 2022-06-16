@@ -1,8 +1,8 @@
 package practice.zhuangzg.springframework.test;
 
 import org.junit.jupiter.api.Test;
-import practice.zhuangzg.springframework.BeanDefinition;
-import practice.zhuangzg.springframework.BeanFactory;
+import practice.zhuangzg.springframework.beans.factory.config.BeanDefinition;
+import practice.zhuangzg.springframework.beans.factory.support.DefaultListableBeanFactory;
 import practice.zhuangzg.springframework.test.bean.UserService;
 
 /**
@@ -14,12 +14,12 @@ public class ApiTest {
 
     @Test
     public void test() {
-        BeanFactory beanFactory = new BeanFactory();
+        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
 
-        BeanDefinition beanDefinition = new BeanDefinition(new UserService());
+        BeanDefinition beanDefinition = new BeanDefinition(UserService.class);
         beanFactory.registerBeanDefinition("userService", beanDefinition);
 
-        UserService userService = (UserService)beanFactory.getBean("userService");
+        UserService userService = (UserService) beanFactory.getBean("userService");
         userService.queryUserInfo();
     }
 }
