@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+    <bean id="userDao" class="practice.zhuangzg.bean.UserDao"/>
+    <bean id="userService" class="practice.zhuangzg.bean.UserService">
+        <property name="uid" value="1001"/>
+        <property name="userDao" ref="userDao"/>
+    </bean>
+
+</beans>
