@@ -13,10 +13,11 @@ import java.util.Objects;
  * @date 2022/6/16 22:57
  * @Description:
  */
-public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory {
+public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory implements BeanDefinitionRegistry{
 
     private final Map<String, BeanDefinition> beanDefinitionMap = new HashMap<>();
 
+    @Override
     public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition) {
         beanDefinitionMap.put(beanName, beanDefinition);
     }
