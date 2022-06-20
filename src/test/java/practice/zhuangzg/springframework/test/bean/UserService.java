@@ -1,5 +1,7 @@
 package practice.zhuangzg.springframework.test.bean;
 
+import javax.jws.soap.SOAPBinding;
+
 /**
  * @author: ZhuangZG
  * @date 2022/6/16 21:42
@@ -7,16 +9,19 @@ package practice.zhuangzg.springframework.test.bean;
  */
 public class UserService {
 
-    private String name;
+    private String uid;
+
+    private UserDao userDao;
 
     public UserService() {
     }
 
-    public UserService(String name) {
-        this.name = name;
+    public UserService(String uid, UserDao userDao) {
+        this.uid = uid;
+        this.userDao = userDao;
     }
 
     public void queryUserInfo() {
-        System.out.println("查询用户信息: " + name);
+        System.out.println("查询用户信息: " + userDao.queryUserName(uid));
     }
 }
