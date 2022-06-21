@@ -13,7 +13,7 @@ import java.util.Objects;
  * @date 2022/6/17 6:42
  * @Description:
  */
-public class CglibInstantiationStrategy implements InstantiationStrategy {
+public class CglibSubclassingInstantiationStrategy implements InstantiationStrategy {
 
     @Override
     public Object instantiate(BeanDefinition beanDefinition, String beanName, Constructor constructor, Object[] args) throws BeansException {

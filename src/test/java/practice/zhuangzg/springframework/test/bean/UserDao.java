@@ -12,9 +12,9 @@ public class UserDao {
     private static Map<String, String> hashMap = new HashMap<>();
 
     static {
-        hashMap.put("10001", "小傅哥");
-        hashMap.put("10002", "八杯水");
-        hashMap.put("10003", "阿毛");
+        hashMap.put("10001", "AAA");
+        hashMap.put("10002", "BBB");
+        hashMap.put("10003", "CCC");
     }
 
     public String queryUserName(String uId) {
