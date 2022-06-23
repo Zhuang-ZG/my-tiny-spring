@@ -20,4 +20,6 @@ public class UserDao {
     public String queryUserName(String uId) {
         return hashMap.get(uId);
     }
+
+
 }
