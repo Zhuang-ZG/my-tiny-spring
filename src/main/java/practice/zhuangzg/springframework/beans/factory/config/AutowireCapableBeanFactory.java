@@ -1,5 +1,6 @@
 package practice.zhuangzg.springframework.beans.factory.config;
 
+import practice.zhuangzg.springframework.beans.BeansException;
 import practice.zhuangzg.springframework.beans.factory.BeanFactory;
 
 /**
@@ -8,5 +9,11 @@ import practice.zhuangzg.springframework.beans.factory.BeanFactory;
  * @Description:
  */
 public interface AutowireCapableBeanFactory extends BeanFactory {
+
+
+    Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName) throws BeansException;
+
+
+    Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName) throws BeansException;
 
 }
