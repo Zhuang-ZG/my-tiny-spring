@@ -9,7 +9,7 @@ import java.util.Objects;
  */
 public class ClassUtils {
 
-    public static ClassLoader getClassLoader() {
+    public static ClassLoader getDefaultClassLoader() {
         ClassLoader classLoader = null;
         try {
             classLoader = Thread.currentThread().getContextClassLoader();

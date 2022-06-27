@@ -1,7 +1,9 @@
 package practice.zhuangzg.springframework.test.bean;
 
-import practice.zhuangzg.springframework.beans.factory.DisposableBean;
-import practice.zhuangzg.springframework.beans.factory.InitializingBean;
+import practice.zhuangzg.springframework.beans.BeansException;
+import practice.zhuangzg.springframework.beans.factory.*;
+import practice.zhuangzg.springframework.context.ApplicationContext;
+import practice.zhuangzg.springframework.context.ApplicationContextAware;
 
 import javax.jws.soap.SOAPBinding;
 
@@ -10,7 +12,10 @@ import javax.jws.soap.SOAPBinding;
  * @date 2022/6/16 21:42
  * @Description:
  */
-public class UserService implements InitializingBean, DisposableBean {
+public class UserService implements BeanNameAware, BeanClassLoaderAware, ApplicationContextAware, BeanFactoryAware {
+
+    private ApplicationContext applicationContext;
+    private BeanFactory beanFactory;
 
     private String uid;
     private String company;
@@ -21,13 +26,23 @@ public class UserService implements InitializingBean, DisposableBean {
     }
 
     @Override
-    public void destroy() throws Exception {
-        System.out.println("执行：UserService.destroy()");
+    public void setBeanClassLoader(ClassLoader classLoader) throws BeansException {
+        System.out.println("classloader: " + classLoader);
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-        System.out.println("执行：UserService.afterPropertiesSet()");
+    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+        this.beanFactory = beanFactory;
+    }
+
+    @Override
+    public void setBeanName(String beanName) throws BeansException {
+        System.out.println("bean name is " + beanName);
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 
     public void queryUserInfo() {
@@ -64,6 +79,14 @@ public class UserService implements InitializingBean, DisposableBean {
 
     public void setUserDao(UserDao userDao) {
         this.userDao = userDao;
+    }
+
+    public ApplicationContext getApplicationContext() {
+        return applicationContext;
+    }
+
+    public BeanFactory getBeanFactory() {
+        return beanFactory;
     }
 
     @Override

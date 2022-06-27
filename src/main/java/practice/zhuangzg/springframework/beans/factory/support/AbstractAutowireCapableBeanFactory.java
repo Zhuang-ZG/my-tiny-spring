@@ -5,12 +5,12 @@ import cn.hutool.core.util.StrUtil;
 import practice.zhuangzg.springframework.beans.BeansException;
 import practice.zhuangzg.springframework.beans.PropertyValue;
 import practice.zhuangzg.springframework.beans.PropertyValues;
-import practice.zhuangzg.springframework.beans.factory.DisposableBean;
-import practice.zhuangzg.springframework.beans.factory.InitializingBean;
+import practice.zhuangzg.springframework.beans.factory.*;
 import practice.zhuangzg.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import practice.zhuangzg.springframework.beans.factory.config.BeanDefinition;
 import practice.zhuangzg.springframework.beans.factory.config.BeanPostProcessor;
 import practice.zhuangzg.springframework.beans.factory.config.BeanReference;
+import practice.zhuangzg.springframework.util.ClassUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -22,6 +22,8 @@ import java.util.Objects;
  * @Description:
  */
 public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory implements AutowireCapableBeanFactory {
+
+    private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
     private InstantiationStrategy instantiationStrategy = new CglibSubclassingInstantiationStrategy();
 
@@ -92,6 +94,21 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     }
 
     private Object initializeBean(String beanName, Object bean, BeanDefinition beanDefinition) {
+
+        if (bean instanceof Aware) {
+            if (bean instanceof BeanFactoryAware) {
+                ((BeanFactoryAware)bean).setBeanFactory(this);
+            }
+
+            if (bean instanceof BeanClassLoaderAware) {
+                ((BeanClassLoaderAware)bean).setBeanClassLoader(getBeanClassLoader());
+            }
+
+            if (bean instanceof BeanNameAware) {
+                ((BeanNameAware)bean).setBeanName(beanName);
+            }
+        }
+
         // BeanPostProcessor 执行前置处理
         Object wrappedBean = applyBeanPostProcessorsBeforeInitialization(bean, beanName);
         // 待完成内容
@@ -148,5 +165,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             result = current;
         }
         return result;
+    }
+
+    private ClassLoader getBeanClassLoader() {
+        return this.beanClassLoader;
     }
 }
