@@ -41,7 +41,7 @@ public class ApiTest {
 
     @Test
     public void testXml() {
-        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
+/*        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
         applicationContext.registerShutdownHook();
 
         UserService userService = applicationContext.getBean("userService", UserService.class);
@@ -49,6 +49,30 @@ public class ApiTest {
         System.out.println(userService.toString());
 
         System.out.println("applicationContextAware: " + userService.getApplicationContext());
-        System.out.println("beanFactory: " + userService.getBeanFactory());
+        System.out.println("beanFactory: " + userService.getBeanFactory());*/
+    }
+
+    @Test
+    public void testProtocol() {
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
+        applicationContext.registerShutdownHook();
+
+        UserService userService01 = applicationContext.getBean("userService", UserService.class);
+        UserService userService02 = applicationContext.getBean("userService", UserService.class);
+
+        System.out.println(userService01);
+        System.out.println(userService02);
+
+        System.out.println(userService01 + "十六进制哈希值：" + Integer.toHexString(userService01.hashCode()));
+
+    }
+
+    @Test
+    public void testFactoryBean() {
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
+        applicationContext.registerShutdownHook();
+
+        UserService userService = applicationContext.getBean("userService", UserService.class);
+        userService.queryUserInfo();
     }
 }

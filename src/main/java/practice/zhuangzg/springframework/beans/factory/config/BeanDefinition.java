@@ -3,12 +3,18 @@ package practice.zhuangzg.springframework.beans.factory.config;
 import practice.zhuangzg.springframework.beans.PropertyValue;
 import practice.zhuangzg.springframework.beans.PropertyValues;
 
+import java.util.Objects;
+
 /**
  * @author: ZhuangZG
  * @date 2022/6/16 21:35
  * @Description:
  */
 public class BeanDefinition {
+
+    String SCOPE_SINGLETON = ConfigurableBeanFactory.SCOPE_SINGLETON;
+
+    String SCOPE_PROTOTYPE = ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
     private Class<?> beanClass;
 
@@ -18,14 +24,33 @@ public class BeanDefinition {
 
     private String destroyMethodName;
 
+    private String scope = SCOPE_SINGLETON;
+
+    private boolean singleton = true;
+
+    private boolean prototype = false;
+
     public BeanDefinition(Class<?> beanClass) {
-        this.beanClass = beanClass;
-        this.propertyValues = new PropertyValues();
+        this(beanClass, null);
     }
 
     public BeanDefinition(Class<?> beanClass, PropertyValues propertyValues) {
         this.beanClass = beanClass;
-        this.propertyValues = propertyValues;
+        this.propertyValues = Objects.nonNull(propertyValues) ? propertyValues : new PropertyValues();
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
+        this.singleton = SCOPE_SINGLETON.equals(scope);
+        this.prototype = SCOPE_PROTOTYPE.equals(scope);
+    }
+
+    public boolean isSingleton() {
+        return singleton;
+    }
+
+    public boolean isPrototype() {
+        return prototype;
     }
 
     public Class getBeanClass() {
