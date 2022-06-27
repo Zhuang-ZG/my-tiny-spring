@@ -1,5 +1,8 @@
 package practice.zhuangzg.springframework.test.bean;
 
+import practice.zhuangzg.springframework.beans.factory.DisposableBean;
+import practice.zhuangzg.springframework.beans.factory.InitializingBean;
+
 import javax.jws.soap.SOAPBinding;
 
 /**
@@ -7,7 +10,7 @@ import javax.jws.soap.SOAPBinding;
  * @date 2022/6/16 21:42
  * @Description:
  */
-public class UserService {
+public class UserService implements InitializingBean, DisposableBean {
 
     private String uid;
     private String company;
@@ -15,6 +18,16 @@ public class UserService {
     private UserDao userDao;
 
     public UserService() {
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        System.out.println("执行：UserService.destroy()");
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        System.out.println("执行：UserService.afterPropertiesSet()");
     }
 
     public void queryUserInfo() {
