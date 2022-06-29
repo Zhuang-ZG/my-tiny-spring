@@ -23,8 +23,6 @@ import java.util.Objects;
  */
 public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory implements AutowireCapableBeanFactory {
 
-    private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
-
     private InstantiationStrategy instantiationStrategy = new CglibSubclassingInstantiationStrategy();
 
     @Override
@@ -45,7 +43,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
         // 判断 SCOPE_SINGLETON、SCOPE_PROTOTYPE
         if (beanDefinition.isSingleton()) {
-            addSingleton(beanName, bean);
+            registerSingleton(beanName, bean);
         }
         return bean;
     }
@@ -175,7 +173,4 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         return result;
     }
 
-    private ClassLoader getBeanClassLoader() {
-        return this.beanClassLoader;
-    }
 }

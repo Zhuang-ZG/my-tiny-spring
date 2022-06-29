@@ -7,6 +7,7 @@ import practice.zhuangzg.springframework.context.support.ClassPathXmlApplication
 import practice.zhuangzg.springframework.test.bean.UserService;
 import practice.zhuangzg.springframework.test.common.MyBeanFactoryPostProcessor;
 import practice.zhuangzg.springframework.test.common.MyBeanPostProcessor;
+import practice.zhuangzg.springframework.test.event.CustomEvent;
 
 /**
  * @author: ZhuangZG
@@ -74,5 +75,14 @@ public class ApiTest {
 
         UserService userService = applicationContext.getBean("userService", UserService.class);
         userService.queryUserInfo();
+    }
+
+    @Test
+    public void testEvent() {
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
+        applicationContext.publishEvent(new CustomEvent(applicationContext, 100L, "customEvent成功了"));
+
+        applicationContext.registerShutdownHook();
+
     }
 }

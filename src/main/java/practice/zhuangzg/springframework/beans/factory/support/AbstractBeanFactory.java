@@ -7,6 +7,7 @@ import practice.zhuangzg.springframework.beans.factory.FactoryBean;
 import practice.zhuangzg.springframework.beans.factory.config.BeanDefinition;
 import practice.zhuangzg.springframework.beans.factory.config.BeanPostProcessor;
 import practice.zhuangzg.springframework.beans.factory.config.ConfigurableBeanFactory;
+import practice.zhuangzg.springframework.util.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,8 @@ import java.util.Objects;
  * @Description:
  */
 public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport implements ConfigurableBeanFactory {
+
+    private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
     private List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
 
@@ -74,4 +77,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
     public List<BeanPostProcessor> getBeanPostProcessors() {
         return beanPostProcessors;
     }
+
+    public ClassLoader getBeanClassLoader() {
+        return this.beanClassLoader;
+    }
+
 }
