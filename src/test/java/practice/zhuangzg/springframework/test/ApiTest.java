@@ -1,12 +1,15 @@
 package practice.zhuangzg.springframework.test;
 
 import org.junit.jupiter.api.Test;
-import practice.zhuangzg.springframework.beans.factory.support.DefaultListableBeanFactory;
-import practice.zhuangzg.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import practice.zhuangzg.springframework.aop.AdvisedSupport;
+import practice.zhuangzg.springframework.aop.TargetSource;
+import practice.zhuangzg.springframework.aop.aspectj.AspectJExpressionPointcut;
+import practice.zhuangzg.springframework.aop.framework.Cglib2AopProxy;
+import practice.zhuangzg.springframework.aop.framework.JdkDynamicAopProxy;
 import practice.zhuangzg.springframework.context.support.ClassPathXmlApplicationContext;
+import practice.zhuangzg.springframework.test.bean.IUserService;
 import practice.zhuangzg.springframework.test.bean.UserService;
-import practice.zhuangzg.springframework.test.common.MyBeanFactoryPostProcessor;
-import practice.zhuangzg.springframework.test.common.MyBeanPostProcessor;
+import practice.zhuangzg.springframework.test.bean.UserServiceInterceptor;
 import practice.zhuangzg.springframework.test.event.CustomEvent;
 
 /**
@@ -18,6 +21,7 @@ public class ApiTest {
 
     @Test
     public void test() {
+/*
         // 1 初始化BeanFactory
         DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
 
@@ -37,6 +41,7 @@ public class ApiTest {
         UserService userService = (UserService) beanFactory.getBean("userService");
         userService.queryUserInfo();
         System.out.println(userService.toString());
+*/
 
     }
 
@@ -83,6 +88,24 @@ public class ApiTest {
         applicationContext.publishEvent(new CustomEvent(applicationContext, 100L, "customEvent成功了"));
 
         applicationContext.registerShutdownHook();
+
+    }
+
+    @Test
+    public void testDynamic() {
+
+        IUserService userService = new UserService();
+
+        AdvisedSupport advisedSupport = new AdvisedSupport();
+        advisedSupport.setTargetSource(new TargetSource(userService));
+        advisedSupport.setMethodInterceptor(new UserServiceInterceptor());
+        advisedSupport.setMethodMatcher(new AspectJExpressionPointcut("execution(* practice.zhuangzg.springframework.test.bean.IUserService.*(..))"));
+
+        IUserService proxy_jdk = (IUserService) new JdkDynamicAopProxy(advisedSupport).getProxy();
+        System.out.println("测试结果：" + proxy_jdk.queryUserInfo());
+
+        IUserService proxy_cglib = (IUserService) new Cglib2AopProxy(advisedSupport).getProxy();
+        System.out.println("测试结果：" + proxy_cglib.register("花花"));
 
     }
 }
