@@ -5,7 +5,7 @@ import org.aspectj.weaver.tools.PointcutParser;
 import org.aspectj.weaver.tools.PointcutPrimitive;
 import practice.zhuangzg.springframework.aop.ClassFilter;
 import practice.zhuangzg.springframework.aop.MethodMatcher;
-import practice.zhuangzg.springframework.aop.PointCut;
+import practice.zhuangzg.springframework.aop.Pointcut;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
@@ -16,19 +16,19 @@ import java.util.Set;
  * @date 2022/6/30 6:37
  * @Description:
  */
-public class AspectJExpressionPointcut implements PointCut, ClassFilter, MethodMatcher {
+public class AspectJExpressionPointcut implements Pointcut, ClassFilter, MethodMatcher {
 
-    private final static Set<PointcutPrimitive>  SUPPORT_PRIMITIVE = new HashSet<>();
+    private static final Set<PointcutPrimitive> SUPPORTED_PRIMITIVES = new HashSet<PointcutPrimitive>();
 
     static {
-        SUPPORT_PRIMITIVE.add(PointcutPrimitive.EXECUTION);
+        SUPPORTED_PRIMITIVES.add(PointcutPrimitive.EXECUTION);
     }
 
     private final PointcutExpression pointcutExpression;
 
     public AspectJExpressionPointcut(String expression) {
-        PointcutParser pointcutParser = PointcutParser.getPointcutParserSupportingSpecifiedPrimitivesAndUsingSpecifiedClassLoaderForResolution(SUPPORT_PRIMITIVE, this.getClass().getClassLoader());
-        this.pointcutExpression = pointcutParser.parsePointcutExpression(expression);
+        PointcutParser pointcutParser = PointcutParser.getPointcutParserSupportingSpecifiedPrimitivesAndUsingSpecifiedClassLoaderForResolution(SUPPORTED_PRIMITIVES, this.getClass().getClassLoader());
+        pointcutExpression = pointcutParser.parsePointcutExpression(expression);
     }
 
     @Override

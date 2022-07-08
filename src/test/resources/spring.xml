@@ -1,17 +1,19 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <beans>
-<!--    <bean id="userService" class="practice.zhuangzg.springframework.test.bean.UserService">-->
-<!--        <property name="uid" value="10001"/>-->
-<!--        <property name="userDao" ref="proxyUserDao"/>-->
-<!--        <property name="company" value="Alibaba"/>-->
-<!--        <property name="location" value="上海"/>-->
-<!--    </bean>-->
 
-<!--    <bean id="proxyUserDao" class="practice.zhuangzg.springframework.test.bean.ProxyFactoryBean"/>-->
+    <bean id="userService" class="practice.zhuangzg.springframework.test.bean.UserService"/>
 
-    <bean class="practice.zhuangzg.springframework.test.event.ContextClosedEventListener"/>
+    <bean class="practice.zhuangzg.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"/>
 
-    <bean class="practice.zhuangzg.springframework.test.event.ContextRefreshedEventListener"/>
+    <bean id="beforeAdvice" class="practice.zhuangzg.springframework.test.bean.UserServiceBeforeAdvice"/>
 
-    <bean class="practice.zhuangzg.springframework.test.event.CustomEventListener"/>
+    <bean id="methodInterceptor" class="practice.zhuangzg.springframework.aop.framework.adapter.MethodBeforeAdviceInterceptor">
+        <property name="advice" ref="beforeAdvice"/>
+    </bean>
+
+    <bean id="pointcutAdvisor" class="practice.zhuangzg.springframework.aop.aspectj.AspectJExpressionPointcutAdvisor">
+        <property name="expression" value="execution(* practice.zhuangzg.springframework.test.bean.IUserService.*(..))"/>
+        <property name="advice" ref="methodInterceptor"/>
+    </bean>
+
 </beans>
