@@ -1,6 +1,7 @@
 package practice.zhuangzg.springframework.context.annotation;
 
 import cn.hutool.core.util.StrUtil;
+import practice.zhuangzg.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import practice.zhuangzg.springframework.beans.factory.config.BeanDefinition;
 import practice.zhuangzg.springframework.beans.factory.support.BeanDefinitionRegistry;
 import practice.zhuangzg.springframework.context.stereotype.Component;
@@ -32,6 +33,8 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
                 registry.registerBeanDefinition(determineBeanName(beanDefinition), beanDefinition);
             }
         }
+        registry.registerBeanDefinition("practice.zhuangzg.springframework.beans.factory.annotation.internalAutowiredAnnotationProcessor", new BeanDefinition(AutowiredAnnotationBeanPostProcessor.class));
+
     }
 
     private String resolveBeanScope(BeanDefinition beanDefinition) {
@@ -47,9 +50,9 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
         Class<?> beanClass = beanDefinition.getBeanClass();
         Component component = beanClass.getAnnotation(Component.class);
         String value = component.value();
-        if (Objects.nonNull(value)) {
-            return component.value();
+        if (StrUtil.isEmpty(value)) {
+            value = StrUtil.lowerFirst(beanClass.getSimpleName());
         }
-        return StrUtil.EMPTY;
+        return value;
     }
 }

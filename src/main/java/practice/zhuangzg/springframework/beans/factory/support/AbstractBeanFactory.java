@@ -1,17 +1,15 @@
 package practice.zhuangzg.springframework.beans.factory.support;
 
 import practice.zhuangzg.springframework.beans.BeansException;
-import practice.zhuangzg.springframework.beans.factory.BeanFactory;
-import practice.zhuangzg.springframework.beans.factory.ConfigurableListableBeanFactory;
 import practice.zhuangzg.springframework.beans.factory.FactoryBean;
 import practice.zhuangzg.springframework.beans.factory.config.BeanDefinition;
 import practice.zhuangzg.springframework.beans.factory.config.BeanPostProcessor;
 import practice.zhuangzg.springframework.beans.factory.config.ConfigurableBeanFactory;
 import practice.zhuangzg.springframework.util.ClassUtils;
+import practice.zhuangzg.springframework.util.StringValueResolver;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -24,6 +22,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
     private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
     private List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
+
+    private List<StringValueResolver> embeddedValueResolvers = new ArrayList<>();
 
     @Override
     public Object getBean(String beanName) throws BeansException {
@@ -72,6 +72,20 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
     public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
         beanPostProcessors.remove(beanPostProcessor);
         beanPostProcessors.add(beanPostProcessor);
+    }
+
+    @Override
+    public void addEmbeddedValueResolver(StringValueResolver valueSolver) {
+        this.embeddedValueResolvers.add(valueSolver);
+    }
+
+    @Override
+    public String resolveEmbeddedValue(String value) {
+        String result = value;
+        for (StringValueResolver resolver : this.embeddedValueResolvers) {
+            result = resolver.resolveStringValue(result);
+        }
+        return result;
     }
 
     public List<BeanPostProcessor> getBeanPostProcessors() {

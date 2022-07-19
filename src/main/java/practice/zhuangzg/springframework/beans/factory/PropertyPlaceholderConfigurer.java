@@ -7,6 +7,7 @@ import practice.zhuangzg.springframework.beans.factory.config.BeanDefinition;
 import practice.zhuangzg.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import practice.zhuangzg.springframework.core.io.DefaultResourceLoader;
 import practice.zhuangzg.springframework.core.io.Resource;
+import practice.zhuangzg.springframework.util.StringValueResolver;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -43,20 +44,15 @@ public class PropertyPlaceholderConfigurer implements BeanFactoryPostProcessor {
                     if (!(value instanceof String)) {
                         continue;
                     }
+                    value = resolvePlaceholder((String)value, properties);
+                    propertyValues.addPropertyValue(new PropertyValue(propertyValue.getName(), value));
 
-                    String strVal = (String) value;
-                    StringBuilder builder = new StringBuilder(strVal);
-                    int indexOfPrefix = strVal.indexOf(DEFAULT_PLACEHOLDER_PREFIX);
-                    int indexOfSuffix = strVal.indexOf(DEFAULT_PLACEHOLDER_SUFFIX);
-
-                    if (indexOfPrefix !=-1 && indexOfSuffix != -1 && indexOfPrefix < indexOfSuffix) {
-                        String propertyKey = strVal.substring(indexOfPrefix + 2, indexOfSuffix);
-                        String propertyVal = properties.getProperty(propertyKey);
-                        builder.replace(indexOfPrefix, indexOfSuffix+1, propertyVal);
-                        propertyValues.addPropertyValue(new PropertyValue(propertyValue.getName(), builder.toString()));
-                    }
                 }
             }
+
+            StringValueResolver valueResolver = new PlaceholderResolvingStringValueResolver(properties);
+            configurableListableBeanFactory.addEmbeddedValueResolver(valueResolver);
+
 
         } catch (IOException e) {
             throw new BeansException("could not load properties", e);
@@ -64,7 +60,35 @@ public class PropertyPlaceholderConfigurer implements BeanFactoryPostProcessor {
 
     }
 
+    private String resolvePlaceholder(String value, Properties properties) {
+        String strVal = (String) value;
+        StringBuilder builder = new StringBuilder(strVal);
+        int indexOfPrefix = strVal.indexOf(DEFAULT_PLACEHOLDER_PREFIX);
+        int indexOfSuffix = strVal.indexOf(DEFAULT_PLACEHOLDER_SUFFIX);
+
+        if (indexOfPrefix !=-1 && indexOfSuffix != -1 && indexOfPrefix < indexOfSuffix) {
+            String propertyKey = strVal.substring(indexOfPrefix + 2, indexOfSuffix);
+            String propertyVal = properties.getProperty(propertyKey);
+            builder.replace(indexOfPrefix, indexOfSuffix+1, propertyVal);
+        }
+        return builder.toString();
+    }
+
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    private class PlaceholderResolvingStringValueResolver implements StringValueResolver {
+
+        private final Properties properties;
+
+        public PlaceholderResolvingStringValueResolver(Properties properties) {
+            this.properties = properties;
+        }
+
+        @Override
+        public String resolveStringValue(String strVal) {
+            return PropertyPlaceholderConfigurer.this.resolvePlaceholder(strVal, properties);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package practice.zhuangzg.springframework.beans.factory.config;
 
 import practice.zhuangzg.springframework.beans.factory.HierarchicalBeanFactory;
+import practice.zhuangzg.springframework.util.StringValueResolver;
 
 /**
  * @author: ZhuangZG
@@ -16,5 +17,9 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
     void addBeanPostProcessor(BeanPostProcessor beanPostProcessor);
 
     void destroySingletons();
+
+    void addEmbeddedValueResolver(StringValueResolver valueSolver);
+
+    String resolveEmbeddedValue(String value);
 
 }
