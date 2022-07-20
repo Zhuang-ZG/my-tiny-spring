@@ -1,0 +1,136 @@
+{
+  "SGXS100001983de10759c451492b4e736ae3832f9": {
+    "0": {
+      "role": "guest",
+      "graph": {
+        "dataio_acs_0": {
+          "index": 0,
+          "component_id": "cmbchina.dataio_sz_test1.edb58ac4",
+          "component_name": "dataio_acs",
+          "component_chinese_name": "数据输入组件_sz_test1",
+          "output": [
+            "data"
+          ],
+          "need_deploy": false,
+          "data": [
+            {
+              "dataset_id": "CMBDf0d7bd6eecae4efc80c7d36184289507",
+              "dataset_name": "58_03",
+              "dataset_uuid": "f0d7bd6eecae4efc80c7d36184289507"
+            }
+          ],
+          "stage_type": "1001"
+        },
+        "private_set_intersection_acs_1": {
+          "index": 1,
+          "component_id": "cmbchina.psi_sz_test1.911def8e",
+          "component_name": "private_set_intersection_acs",
+          "component_chinese_name": "隐私集合求交组件_sz_test1",
+          "input": [
+            "dataio_acs_0.data"
+          ],
+          "output": [
+            "data"
+          ],
+          "need_deploy": false,
+          "stage_type": "1002"
+        },
+        "two_party_hetero_lr_acs_2": {
+          "index": 2,
+          "component_id": "cmbchina.hetero_lr_two_party_sz_test1.ac3c0734",
+          "component_name": "two_party_hetero_lr_acs",
+          "component_chinese_name": "两方纵向逻辑回归_sz_test1",
+          "input": [
+            "private_set_intersection_acs_1.data"
+          ],
+          "output": [
+            "data"
+          ],
+          "need_deploy": true,
+          "stage_type": "1004"
+        },
+        "evaluation_acs_3": {
+          "index": 3,
+          "component_id": "cmbchina.evaluation_sz_test1.9014c3c8",
+          "component_name": "evaluation_acs",
+          "component_chinese_name": "模型评估组件_sz_test1",
+          "input": [
+            "two_party_hetero_lr_acs_2.data"
+          ],
+          "output": [
+            "data"
+          ],
+          "need_deploy": false,
+          "stage_type": "1005"
+        }
+      }
+    }
+  },
+  "SGXS100001872ce10759c451492b4e736ae3821e8": {
+    "1": {
+      "role": "host",
+      "graph": {
+        "dataio_acs_0": {
+          "index": 0,
+          "component_id": "cmbchina.dataio_sz_test.edb58ac4",
+          "component_name": "dataio_acs",
+          "component_chinese_name": "数据输入组件_sz_test",
+          "output": [
+            "data"
+          ],
+          "need_deploy": false,
+          "data": [
+            {
+              "dataset_id": "CMBD42261ccd95b54e84a8b73655edf8b14f",
+              "dataset_name": "57_03",
+              "dataset_uuid": "ca77f69c092e4c788503ca216a3a95d2"
+            }
+          ],
+          "stage_type": "1001"
+        },
+        "private_set_intersection_acs_1": {
+          "index": 1,
+          "component_id": "cmbchina.psi_sz_test1.911def8e",
+          "component_name": "private_set_intersection_acs",
+          "component_chinese_name": "隐私集合求交组件_sz_test1",
+          "input": [
+            "dataio_acs_0.data"
+          ],
+          "output": [
+            "data"
+          ],
+          "need_deploy": false,
+          "stage_type": "1002"
+        },
+        "two_party_hetero_lr_acs_2": {
+          "index": 2,
+          "component_id": "cmbchina.hetero_lr_two_party_sz_test1.ac3c0734",
+          "component_name": "two_party_hetero_lr_acs",
+          "component_chinese_name": "两方纵向逻辑回归_sz_test1",
+          "input": [
+            "private_set_intersection_acs_1.data"
+          ],
+          "output": [
+            "data"
+          ],
+          "need_deploy": true,
+          "stage_type": "1004"
+        },
+        "evaluation_acs_3": {
+          "index": 3,
+          "component_id": "cmbchina.evaluation_sz_test.9014c3c8",
+          "component_name": "evaluation_acs",
+          "component_chinese_name": "模型评估组件_sz_test",
+          "input": [
+            "two_party_hetero_lr_acs_2.data"
+          ],
+          "output": [
+            "data"
+          ],
+          "need_deploy": false,
+          "stage_type": "1005"
+        }
+      }
+    }
+  }
+}

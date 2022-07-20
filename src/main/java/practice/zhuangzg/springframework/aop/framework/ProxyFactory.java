@@ -16,7 +16,7 @@ public class ProxyFactory {
     }
 
     public Object getProxy() {
-        return createAopProxy();
+        return createAopProxy().getProxy();
     }
 
     private AopProxy createAopProxy() {
@@ -26,4 +26,5 @@ public class ProxyFactory {
 
         return new JdkDynamicAopProxy(advisedSupport);
     }
+
 }

@@ -22,7 +22,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     private InstantiationStrategy instantiationStrategy = new CglibSubclassingInstantiationStrategy();
 
     @Override
-    protected Object createBean(String beanName, BeanDefinition beanDefinition, Object[] args) {
+    protected Object createBean(String beanName, BeanDefinition beanDefinition, Object[] args) throws BeansException {
         Object bean;
         try {
             // 判断是否返回代理 Bean 对象
@@ -32,6 +32,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             }
             // 实例化 Bean
             bean = createBeanInstance(beanDefinition, beanName, args);
+            // 实例化后判断
+            boolean continueWithPropertyPopulation = applyBeanPostProcessorsAfterInstantiation(beanName, bean);
+            if (!continueWithPropertyPopulation) {
+                return bean;
+            }
             // 在设置 Bean 属性之前，允许 BeanPostProcessor 修改属性值
             applyBeanPostProcessorsBeforeApplyingPropertyValues(beanName, bean, beanDefinition);
             // 给 Bean 填充属性
@@ -50,6 +55,21 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             registerSingleton(beanName, bean);
         }
         return bean;
+    }
+
+
+    private boolean applyBeanPostProcessorsAfterInstantiation(String beanName, Object bean) {
+        boolean continueWithPropertyPopulation = true;
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                InstantiationAwareBeanPostProcessor instantiationAwareBeanPostProcessor = (InstantiationAwareBeanPostProcessor) beanPostProcessor;
+                if (!instantiationAwareBeanPostProcessor.postProcessAfterInstantiation(bean, beanName)) {
+                    continueWithPropertyPopulation = false;
+                    break;
+                }
+            }
+        }
+        return continueWithPropertyPopulation;
     }
 
     protected void applyBeanPostProcessorsBeforeApplyingPropertyValues(String beanName, Object bean, BeanDefinition beanDefinition) {
@@ -91,10 +111,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             return;
         }
 
-        if (bean instanceof DisposableBean ||
-            StrUtil.isNotEmpty(beanDefinition.getDestroyMethodName())
-        ) {
-            registerDisposableBean(beanName, new DisableBeanAdapter(bean, beanName, beanDefinition));
+        if (bean instanceof DisposableBean || StrUtil.isNotEmpty(beanDefinition.getDestroyMethodName())) {
+            registerDisposableBean(beanName, new DisposableBeanAdapter(bean, beanName, beanDefinition));
         }
     }
 
@@ -103,7 +121,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         Constructor<?>[] constructors = beanClass.getDeclaredConstructors();
         Constructor<?> constructorToUse = null;
         for (Constructor<?> constructor : constructors) {
-            if (args != null && constructor.getParameterTypes().length == args.length) {
+            if (Objects.nonNull(args)&& constructor.getParameterTypes().length == args.length) {
                 constructorToUse = constructor;
                 break;
             }
@@ -111,20 +129,27 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         return getInstantiationStrategy().instantiate(beanDefinition, beanName, constructorToUse, args);
     }
 
+    /**
+     * Bean 属性填充
+     */
     private void applyPropertyValues(String beanName, Object bean, BeanDefinition beanDefinition) {
         try {
             PropertyValues propertyValues = beanDefinition.getPropertyValues();
             for (PropertyValue propertyValue : propertyValues.getPropertyValues()) {
+
                 String name = propertyValue.getName();
                 Object value = propertyValue.getValue();
+
                 if (value instanceof BeanReference) {
+                    // A 依赖 B，获取 B 的实例化
                     BeanReference beanReference = (BeanReference) value;
                     value = getBean(beanReference.getBeanName());
                 }
-                BeanUtil.setProperty(bean, name, value);
+                // 属性填充
+                BeanUtil.setFieldValue(bean, name, value);
             }
         } catch (Exception e) {
-            throw new BeansException("Error setting property values: " + beanName, e);
+            throw new BeansException("Error setting property values：" + beanName);
         }
     }
 
@@ -138,29 +163,32 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
     private Object initializeBean(String beanName, Object bean, BeanDefinition beanDefinition) {
 
+        // invokeAwareMethods
         if (bean instanceof Aware) {
             if (bean instanceof BeanFactoryAware) {
-                ((BeanFactoryAware)bean).setBeanFactory(this);
+                ((BeanFactoryAware) bean).setBeanFactory(this);
             }
 
             if (bean instanceof BeanClassLoaderAware) {
-                ((BeanClassLoaderAware)bean).setBeanClassLoader(getBeanClassLoader());
+                ((BeanClassLoaderAware) bean).setBeanClassLoader(getBeanClassLoader());
             }
 
             if (bean instanceof BeanNameAware) {
-                ((BeanNameAware)bean).setBeanName(beanName);
+                ((BeanNameAware) bean).setBeanName(beanName);
             }
         }
 
-        // BeanPostProcessor 执行前置处理
+        // 1. 执行 BeanPostProcessor Before 处理
         Object wrappedBean = applyBeanPostProcessorsBeforeInitialization(bean, beanName);
-        // 待完成内容
+
+        // 执行 Bean 对象的初始化方法
         try {
-            invokeInitMethods(beanName, bean, beanDefinition);
+            invokeInitMethods(beanName, wrappedBean, beanDefinition);
         } catch (Exception e) {
-            throw new BeansException("invoke init method of bean[" + beanName + "] failed", e);
+            throw new BeansException("Invocation of init method of bean[" + beanName + "] failed", e);
         }
-        // BeanPostProcessor 执行后置处理
+
+        // 2. 执行 BeanPostProcessor After 处理
         wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
         return wrappedBean;
     }
@@ -168,16 +196,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     private void invokeInitMethods(String beanName, Object bean, BeanDefinition beanDefinition) throws Exception {
         // 1. 实现接口 InitializingBean
         if (bean instanceof InitializingBean) {
-            ((InitializingBean)bean).afterPropertiesSet();
+            ((InitializingBean) bean).afterPropertiesSet();
         }
 
-        // 2. 注解配置 init-method {判断是为了避免二次执行初始化}
+        // 2. 注解配置 init-method {判断是为了避免二次执行销毁}
         String initMethodName = beanDefinition.getInitMethodName();
         if (StrUtil.isNotEmpty(initMethodName)) {
-            Method initMethod = bean.getClass().getMethod(initMethodName);
+            Method initMethod = beanDefinition.getBeanClass().getMethod(initMethodName);
             if (Objects.isNull(initMethod)) {
-                throw new BeansException("could not find init method named '"
-                        + initMethodName + "' on bean with name '" + beanName + "'");
+                throw new BeansException("Could not find an init method named '" + initMethodName + "' on bean with name '" + beanName + "'");
             }
             initMethod.invoke(bean);
         }

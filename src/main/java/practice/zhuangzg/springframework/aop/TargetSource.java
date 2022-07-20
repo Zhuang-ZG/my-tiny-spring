@@ -1,5 +1,7 @@
 package practice.zhuangzg.springframework.aop;
 
+import practice.zhuangzg.springframework.util.ClassUtils;
+
 /**
  * @author: ZhuangZG
  * @date 2022/6/30 6:46
@@ -14,10 +16,12 @@ public class TargetSource {
     }
 
     public Class<?>[] getTargetClass() {
-        return target.getClass().getInterfaces();
+        Class<?> clazz = this.target.getClass();
+        clazz = ClassUtils.isCglibProxyClass(clazz) ? clazz.getSuperclass() : clazz;
+        return clazz.getInterfaces();
     }
 
     public Object getTarget() {
-        return target;
+        return this.target;
     }
 }

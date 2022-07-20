@@ -4,7 +4,6 @@ import cn.hutool.core.util.StrUtil;
 import practice.zhuangzg.springframework.beans.BeansException;
 import practice.zhuangzg.springframework.beans.factory.DisposableBean;
 import practice.zhuangzg.springframework.beans.factory.config.BeanDefinition;
-import sun.swing.StringUIClientPropertyKey;
 
 import java.lang.reflect.Method;
 import java.util.Objects;
@@ -14,13 +13,13 @@ import java.util.Objects;
  * @date 2022/6/24 11:06
  * @Description:
  */
-public class DisableBeanAdapter implements DisposableBean {
+public class DisposableBeanAdapter implements DisposableBean {
 
     private final Object bean;
     private final String beanName;
     private String destroyMethodName;
 
-    public DisableBeanAdapter(Object bean, String beanName, BeanDefinition beanDefinition) {
+    public DisposableBeanAdapter(Object bean, String beanName, BeanDefinition beanDefinition) {
         this.bean = bean;
         this.beanName = beanName;
         this.destroyMethodName = beanDefinition.getDestroyMethodName();
