@@ -4,20 +4,28 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
 	         http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="userService" class="practice.zhuangzg.springframework.test.bean.UserService">
-        <property name="token" value="RejDlI78hu223Opo983Ds"/>
+    <bean id="husband" class="practice.zhuangzg.springframework.test.bean.Husband">
+        <property name="wife" ref="wife"/>
     </bean>
 
+    <bean id="husbandMother" class="practice.zhuangzg.springframework.test.bean.HusbandMother"/>
+
+    <bean id="wife" class="practice.zhuangzg.springframework.test.bean.Wife">
+        <property name="husband" ref="husband"/>
+        <property name="mother" ref="husbandMother"/>
+    </bean>
+
+    <!-- AOP 配置，验证三级缓存 -->
     <bean class="practice.zhuangzg.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"/>
 
-    <bean id="beforeAdvice" class="practice.zhuangzg.springframework.test.bean.UserServiceBeforeAdvice"/>
+    <bean id="beforeAdvice" class="practice.zhuangzg.springframework.test.bean.SpouseAdvice"/>
 
     <bean id="methodInterceptor" class="practice.zhuangzg.springframework.aop.framework.adapter.MethodBeforeAdviceInterceptor">
         <property name="advice" ref="beforeAdvice"/>
     </bean>
 
     <bean id="pointcutAdvisor" class="practice.zhuangzg.springframework.aop.aspectj.AspectJExpressionPointcutAdvisor">
-        <property name="expression" value="execution(* practice.zhuangzg.springframework.test.bean.IUserService.*(..))"/>
+        <property name="expression" value="execution(* practice.zhuangzg.springframework.test.bean.Wife.*(..))"/>
         <property name="advice" ref="methodInterceptor"/>
     </bean>
 
