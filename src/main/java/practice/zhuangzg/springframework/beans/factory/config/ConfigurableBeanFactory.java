@@ -1,6 +1,7 @@
 package practice.zhuangzg.springframework.beans.factory.config;
 
 import practice.zhuangzg.springframework.beans.factory.HierarchicalBeanFactory;
+import practice.zhuangzg.springframework.core.convert.ConversionService;
 import practice.zhuangzg.springframework.util.StringValueResolver;
 
 /**
@@ -21,5 +22,10 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
     void addEmbeddedValueResolver(StringValueResolver valueSolver);
 
     String resolveEmbeddedValue(String value);
+
+    ConversionService getConversionService();
+
+    void setConversionService(ConversionService conversionService);
+
 
 }

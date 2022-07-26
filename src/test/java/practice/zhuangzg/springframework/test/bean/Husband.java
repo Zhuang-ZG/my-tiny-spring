@@ -1,5 +1,7 @@
 package practice.zhuangzg.springframework.test.bean;
 
+import java.time.LocalDate;
+
 /**
  * @author: ZhuangZG
  * @date 2022/7/20 14:18
@@ -7,18 +9,31 @@ package practice.zhuangzg.springframework.test.bean;
  */
 public class Husband {
 
-    private Wife wife;
+    private String wifeName;
 
-    public String queryWife(){
-        return "Husband.wife";
+    private LocalDate marriageDate;
+
+    public String getWifeName() {
+        return wifeName;
     }
 
-    public Wife getWife() {
-        return wife;
+    public void setWifeName(String wifeName) {
+        this.wifeName = wifeName;
     }
 
-    public void setWife(Wife wife) {
-        this.wife = wife;
+    public LocalDate getMarriageDate() {
+        return marriageDate;
     }
 
+    public void setMarriageDate(LocalDate marriageDate) {
+        this.marriageDate = marriageDate;
+    }
+
+    @Override
+    public String toString() {
+        return "Husband{" +
+                "wifeName='" + wifeName + '\'' +
+                ", marriageDate=" + marriageDate +
+                '}';
+    }
 }

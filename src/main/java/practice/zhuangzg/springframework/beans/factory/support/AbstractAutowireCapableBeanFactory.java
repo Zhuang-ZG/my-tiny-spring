@@ -2,14 +2,17 @@ package practice.zhuangzg.springframework.beans.factory.support;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.TypeUtil;
 import practice.zhuangzg.springframework.beans.BeansException;
 import practice.zhuangzg.springframework.beans.PropertyValue;
 import practice.zhuangzg.springframework.beans.PropertyValues;
 import practice.zhuangzg.springframework.beans.factory.*;
 import practice.zhuangzg.springframework.beans.factory.config.*;
+import practice.zhuangzg.springframework.core.convert.ConversionService;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Objects;
 
 /**
@@ -173,6 +176,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                     // A 依赖 B，获取 B 的实例化
                     BeanReference beanReference = (BeanReference) value;
                     value = getBean(beanReference.getBeanName());
+                }
+
+                // 类型转换
+                else {
+                    Class<?> sourceType = value.getClass();
+                    Class<?> targetType = (Class<?>) TypeUtil.getFieldType(bean.getClass(), name);
+
+                    ConversionService conversionService = getConversionService();
+                    if (Objects.nonNull(conversionService)) {
+                        if (conversionService.canConvert(sourceType, targetType)) {
+                            value = conversionService.convert(value, targetType);
+                        }
+                    }
                 }
                 // 属性填充
                 BeanUtil.setFieldValue(bean, name, value);
